@@ -8,13 +8,18 @@ import {
 import { useState } from "react";
 import languageData from '../data/langugages.json'
 
-export default function Language() {
+interface LanguageProps {
+  onLanguageChange: (value: string) => void; //Callback function to pass the selectedLanguage;
+}
+
+export default function Language({ onLanguageChange }: LanguageProps) {
 
   const [selectedLanguage, setSelectedLanguage] = useState<string>('');
 
   const handleChange = (value: string) => {
     if (value !== '') {
       setSelectedLanguage(value);
+      onLanguageChange(value);
     }
   }
 
