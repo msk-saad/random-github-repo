@@ -1,54 +1,53 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 // import Image from "next/image";
 import Language from '../components/Language'
 import RepoCard from '../components/RepoCard'
+import languages from '../data/langugages.json';
 
-interface Repo {
-  name: String;
-  html_url: string;
-  description: String;
-  language: String;
-  stars: number;
-  fork: number;
-  issue: number;
-}
+export default function Page () {
 
-interface HomePageProps {
-  initialRepo: Repo;
-}
+  const [repository, setRepository] = useState(null);
 
-export default function Home({initialRepo}: HomePageProps) {
-  const [repo, setRepo] = useState<Repo>(initialRepo);
-  const [loading, setLoading] = useState<Boolean>(false);
+  const repositories = [
+    'https://api.github.com/repos/msk-saad/next-gittok',
+    'https://api.github.com/repos/facebook/react',
+    'https://api.github.com/repos/vercel/next.js',
+    'https://api.github.com/repos/tailwindlabs/tailwindcss',
+    'https://api.github.com/repos/vuejs/vue',
+  ];
+
+  useEffect(() => {
+    // Fetches the repository data here and set it using setRepository
+    fetchNewRepo();
+  }, []);
 
   const fetchNewRepo = async () => {
-    setLoading(true);
-    const res = await fetch('https://github.com/repositories');
-    const data = await res.json();
-    const randomRepo = data[Math.floor(Math.random() * data.length)];
+    try {
+      const randomLanguage = languages[Math.floor(Math.random() * languages.length)];
 
-    setRepo({
-      name: randomRepo.name,
-      html_url: randomRepo.html_url,
-      description: randomRepo.description || 'No description available',
-      language: randomRepo.language,
-      stars: randomRepo.stars,
-      fork: randomRepo.fork,
-      issue: randomRepo.issue
-    });
-    setLoading(false);
-  }
+      const res = await fetch(`https://api.github.com/search/repositories?q=language:${randomLanguage}&sort=stars&order=desc`)
+      const data = await res.json();
+
+      if (data.items && data.items.length > 0) {
+        const randomRepo = data.items[Math.floor(Math.random() * data.items.length)]; //Picking a random repo from the search
+        setRepository(randomRepo);
+      } else {
+        fetchNewRepo(); //If no results, try again with a different random language
+      }
+    } catch (error) {
+      console.error('Error fetching repository: ', error);
+    }
+  };
+
   return (
     <>
       <div className="body-container flex flex-col justify-center items-center mt-24">
 
         <Language />
 
-        {/* <RepoCard name={repo.name} description={repo.description} url={repo.html_url} language={repo.language} stars={repo.stars} fork={repo.fork} issue={repo.issue}/> */}
-
-        <RepoCard name = "gittok" description="tiktok for github" url='#' language='Typescript' stars='1234' fork='200' issue='1'/>
+        {repository && <RepoCard repository={repository}/>}
 
 
         <div className="refresh m-2">
