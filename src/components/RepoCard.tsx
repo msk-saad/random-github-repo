@@ -1,12 +1,7 @@
 import React from 'react';
 import {
-  CircleDot,
   GitFork,
-  GitPullRequest,
-  Share2,
   Star,
-  Calendar,
-  Clock
 } from 'lucide-react';
 
 import Image from 'next/image';
